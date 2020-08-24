@@ -1,0 +1,7 @@
+*/__pycache__/*
+media
+api_dm/migrations/__pycache__/
+api_user/migrations/__pycache__/
+core/migrations/__pycache__/
+.env
+db.sqlite3
