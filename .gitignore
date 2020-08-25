@@ -5,3 +5,5 @@ api_user/migrations/__pycache__/
 core/migrations/__pycache__/
 .env
 db.sqlite3
+
+frontend/sns-react/node_modules
