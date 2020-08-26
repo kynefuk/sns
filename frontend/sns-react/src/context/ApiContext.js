@@ -17,13 +17,14 @@ const ApiContextProvider = (props) => {
   useEffect(() => {
     const getMyProfile = async () => {
       try {
-        const myprofile = await axios.get('http://localhost:8000/myprofile/', {
+        const myProfile = await axios.get('http://localhost:8000/myprofile/', {
           headers: {
             Authorization: `Token ${token}`,
           },
         });
 
-        const res = await axios.get(
+        // FriendRequest
+        const approval = await axios.get(
           'http://localhost:8000/api/user/approval/',
           {
             headers: {
@@ -32,19 +33,19 @@ const ApiContextProvider = (props) => {
           }
         );
 
-        myprofile.data[0] && setProfile(myprofile.data[0]);
-        myprofile.data[0] &&
+        myProfile.data[0] && setProfile(myProfile.data[0]);
+        myProfile.data[0] &&
           setEditedProfile({
-            id: myprofile.data[0].id,
-            nickName: myprofile.data[0].nickName,
+            id: myProfile.data[0].id,
+            nickName: myProfile.data[0].nickName,
           });
-        myprofile.data[0] &&
+        myProfile.data[0] &&
           setAskList(
-            res.data.filter((ask) => {
-              return myprofile.data[0].userPro === ask.askTo;
+            approval.data.filter((ask) => {
+              return myProfile.data[0].userPro === ask.askTo;
             })
           );
-        setAskListFull(res.data);
+        setAskListFull(approval.data);
       } catch (error) {
         console.error(error);
       }
@@ -81,7 +82,178 @@ const ApiContextProvider = (props) => {
     getInbox();
   }, [token, profile.id]);
 
-  return <></>;
+  const createProfile = async () => {
+    const createData = new FormData();
+    createData.append('nickName', editedProfile.nickName);
+    cover.name && createData.append('img', cover, cover.name);
+
+    try {
+      const res = await axios.post(
+        'http://localhost:8000/api/user/profile/',
+        createData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+      setProfile(res.data);
+      setEditedProfile({ id: res.data.id, nickName: res.data.nickName });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteProfile = async () => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:8000/api/user/profile/${profile.id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+      setProfiles(profiles.filter((p) => p.id !== profile.id));
+      setProfile([]);
+      setEditedProfile({ id: '', nickName: '' });
+      setCover([]);
+      setAskList([]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const editProfile = async () => {
+    const editData = new FormData();
+    editData.append('nickName', editedProfile.nickName);
+    cover.name && editData.append('img', cover, cover.name);
+
+    try {
+      const res = await axios.put(
+        `http://localhost:8000/api/user/profile/${profile.id}`,
+        editData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+      setProfile(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const newRequestFriend = async (askData) => {
+    try {
+      const res = await axios.post(
+        'http://localhost:8000/api/user/approval',
+        askData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+      setAskListFull([...setAskListFull, res.data]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const sendDM = async (uploadDM) => {
+    try {
+      await axios.post('http://localhost:8000/api/dm/message/', uploadDM, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${token}`,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const changeApprovalRequest = async (uploadDataAsk, ask) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:8000/api/user/approval/${ask.id}`,
+        uploadDataAsk,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+      setAskList(askList.map((item) => (item.id === ask.id ? res.data : item)));
+
+      const newDataAsk = new FormData();
+      newDataAsk.append('askTo', ask.askFrom);
+      newDataAsk.append('approved', true);
+
+      const newDataAskPut = new FormData();
+      newDataAskPut.append('askTo', ask.askFrom);
+      newDataAskPut.append('askFrom', ask.askTo);
+      newDataAskPut.append('approved', true);
+
+      const resp = askListFull.filter((item) => {
+        return item.askFrom === profile.userPro && item.askTo === ask.askFrom;
+      });
+      !resp[0]
+        ? await axios.post(
+            `http://localhost:8000/api/user/approval/`,
+            newDataAsk,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Token ${token}`,
+              },
+            }
+          )
+        : await axios.put(
+            `http://localhost:8000/api/user/approval/${resp[0].id}`,
+            newDataAskPut,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Token ${token}`,
+              },
+            }
+          );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <ApiContext.Provider
+      value={{
+        profile,
+        profiles,
+        cover,
+        setCover,
+        askList,
+        askListFull,
+        inbox,
+        newRequestFriend,
+        createProfile,
+        editProfile,
+        deleteProfile,
+        changeApprovalRequest,
+        sendDM,
+        editedProfile,
+        setEditedProfile,
+      }}
+    >
+      {props.children}
+    </ApiContext.Provider>
+  );
 };
 
-export default withCookies(ApiContext);
+export default withCookies(ApiContextProvider);
