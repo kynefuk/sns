@@ -50,20 +50,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialState = {
-  isLoading: false,
-  isLoginView: true,
-  error: '',
-  credentialsLog: {
-    username: '',
-    password: '',
-  },
-  credentialsReg: {
-    email: '',
-    password: '',
-  },
-};
-
 const loginReducer = (state, action) => {
   switch (action.type) {
     case START_FETCH: {
@@ -105,15 +91,28 @@ const loginReducer = (state, action) => {
 
 const Login = (props) => {
   const classes = useStyles();
+  const initialState = {
+    isLoading: false,
+    isLoginView: true,
+    error: '',
+    credentialsLog: {
+      username: '',
+      password: '',
+    },
+    credentialsReg: {
+      email: '',
+      password: '',
+    },
+  };
   const [state, dispatch] = useReducer(loginReducer, initialState);
 
   const inputChanged = (event) => {
-    const cred = state.credentialsLog;
-    cred[event.target.name] = event.target.value;
+    const credential = state.credentialsLog;
+    credential[event.target.name] = event.target.value;
     dispatch({
       type: INPUT_EDIT,
       inputName: 'state.credentialLog',
-      payload: cred,
+      payload: credential,
     });
   };
 
@@ -132,7 +131,7 @@ const Login = (props) => {
     if (state.isLoginView) {
       try {
         dispatch({ type: START_FETCH });
-        const res = axios.post(
+        const res = await axios.post(
           'http://localhost:8000/authen/',
           state.credentialsLog,
           {
@@ -225,21 +224,20 @@ const Login = (props) => {
               type='password'
               name='password'
               value={state.credentialsReg.password}
-              onChange={inputChangedReg()}
+              onChange={inputChangedReg}
               autoFocus
             />
           )}
           <span className={classes.spanError}>{state.error}</span>
 
           {state.isLoginView ? (
-            !state.credentialsLog.password || !state.credentialsLog.username ? (
+            state.credentialsLog.password && state.credentialsLog.username ? (
               <Button
                 className={classes.submit}
                 type='submit'
                 fullWidth
                 variant='contained'
                 color='primary'
-                disabled
               >
                 Login
               </Button>
@@ -250,18 +248,18 @@ const Login = (props) => {
                 fullWidth
                 variant='contained'
                 color='primary'
+                disabled
               >
                 Login
               </Button>
             )
-          ) : !state.credentialsReg.password || !state.credentialsReg.email ? (
+          ) : state.credentialsReg.password && state.credentialsReg.email ? (
             <Button
               className={classes.submit}
               type='submit'
               fullWidth
               variant='contained'
               color='primary'
-              disabled
             >
               Register
             </Button>
@@ -272,12 +270,13 @@ const Login = (props) => {
               fullWidth
               variant='contained'
               color='primary'
+              disabled
             >
               Register
             </Button>
           )}
 
-          <span onClick={() => toggleView()} className={classes.span}>
+          <span onClick={toggleView} className={classes.span}>
             {state.isLoginView ? 'Create Account' : 'Back to login ?'}
           </span>
         </div>
