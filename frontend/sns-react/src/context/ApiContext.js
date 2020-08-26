@@ -17,11 +17,14 @@ const ApiContextProvider = (props) => {
   useEffect(() => {
     const getMyProfile = async () => {
       try {
-        const myProfile = await axios.get('http://localhost:8000/myprofile/', {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        });
+        const myProfile = await axios.get(
+          'http://localhost:8000/api/user/myprofile/',
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
 
         // FriendRequest
         const approval = await axios.get(
@@ -53,7 +56,7 @@ const ApiContextProvider = (props) => {
 
     const getProfiles = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/user/profile', {
+        const res = await axios.get('http://localhost:8000/api/user/profile/', {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -108,7 +111,7 @@ const ApiContextProvider = (props) => {
   const deleteProfile = async () => {
     try {
       const res = await axios.delete(
-        `http://localhost:8000/api/user/profile/${profile.id}`,
+        `http://localhost:8000/api/user/profile/${profile.id}/`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -133,7 +136,7 @@ const ApiContextProvider = (props) => {
 
     try {
       const res = await axios.put(
-        `http://localhost:8000/api/user/profile/${profile.id}`,
+        `http://localhost:8000/api/user/profile/${profile.id}/`,
         editData,
         {
           headers: {
@@ -151,7 +154,7 @@ const ApiContextProvider = (props) => {
   const newRequestFriend = async (askData) => {
     try {
       const res = await axios.post(
-        'http://localhost:8000/api/user/approval',
+        'http://localhost:8000/api/user/approval/',
         askData,
         {
           headers: {
@@ -182,7 +185,7 @@ const ApiContextProvider = (props) => {
   const changeApprovalRequest = async (uploadDataAsk, ask) => {
     try {
       const res = await axios.put(
-        `http://localhost:8000/api/user/approval/${ask.id}`,
+        `http://localhost:8000/api/user/approval/${ask.id}/`,
         uploadDataAsk,
         {
           headers: {
@@ -217,7 +220,7 @@ const ApiContextProvider = (props) => {
             }
           )
         : await axios.put(
-            `http://localhost:8000/api/user/approval/${resp[0].id}`,
+            `http://localhost:8000/api/user/approval/${resp[0].id}/`,
             newDataAskPut,
             {
               headers: {
