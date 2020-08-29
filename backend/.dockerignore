@@ -1,0 +1,7 @@
+.git
+docker-compose.yaml
+Dockerfile
+media
+frontend
+.vscode
+.devcontainer
