@@ -23,13 +23,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["id", "nickName", "userPro", "created_on", "img"]
-        extra_kwargs = {"userPro": {"read_only": True}}
+        fields = ["id", "nick_name", "user", "created_on", "img"]
+        extra_kwargs = {"user": {"read_only": True}}
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
-        fields = ["id", "askFrom", "askTo", "approved"]
+        fields = ["id", "ask_from", "ask_to", "is_approved"]
         # askFromはrequest.userになるよう設定しているためwriteできなくて良い
-        extra_kwargs = {"askFrom": {"read_only": True}}
+        extra_kwargs = {"ask_from": {"read_only": True}}

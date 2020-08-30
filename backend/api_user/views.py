@@ -22,13 +22,13 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """自分宛て、自分から送ったFriendRequestのみ"""
         return self.queryset.filter(
-            Q(askTo=self.request.user) | Q(askFrom=self.request.user)
+            Q(ask_to=self.request.user) | Q(ask_from=self.request.user)
         )
 
     def perform_create(self, serializer):
-        """レコード作成する際は、askFromはリクエストユーザとする"""
+        """レコード作成する際は、ask_fromはリクエストユーザとする"""
         try:
-            serializer.save(askFrom=self.request.user)
+            serializer.save(ask_from=self.request.user)
         except Exception:
             raise ValidationError("User can have only unique request")
 
@@ -43,7 +43,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     )
 
     def perform_create(self, serializer):
-        serializer.save(userPro=self.request.user)
+        serializer.save(user=self.request.user)
 
 
 class MyProfileListView(generics.ListAPIView):
@@ -54,4 +54,4 @@ class MyProfileListView(generics.ListAPIView):
 
     def get_queryset(self):
         """リクエストユーザに紐づくProfileのみ返す"""
-        return self.queryset.filter(userPro=self.request.user)
+        return self.queryset.filter(user=self.request.user)

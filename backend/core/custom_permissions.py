@@ -6,4 +6,4 @@ class ProfilePermission(permissions.BasePermission):
         """自分のProfileのみ更新・削除できる"""
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.userPro.id == request.user.id
+        return obj.user.id == request.user.id
