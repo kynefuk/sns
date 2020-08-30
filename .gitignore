@@ -1,9 +1,7 @@
-*/__pycache__/*
-media
-api_dm/migrations/__pycache__/
-api_user/migrations/__pycache__/
-core/migrations/__pycache__/
-.env
-db.sqlite3
+backend/*/__pycache__/*
+backend/media
+backend/*/migrations/__pycache__/
+backend/.env
+backend/db.sqlite3
 
 frontend/sns-react/node_modules

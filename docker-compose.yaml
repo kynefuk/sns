@@ -1,9 +1,11 @@
-version: '3'
+version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: ./backend
+      target: runner
     ports:
       - '8000:8000'
     volumes:
-      - .:/app
+      - ./backend:/app
