@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { ApiContext } from '../context/ApiContext';
-import { makeStyles } from '@material-ui/core/styles';
 import {
   Button,
   Card,
   CardMedia,
   CardContent,
   Typography,
+  makeStyles,
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -17,13 +17,12 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = ({ profileData, askData }) => {
   const classes = useStyles();
-  const { newRequestFriend, profile } = useContext(ApiContext);
-  console.log(askData);
+  const { postNewFriendRequest, profile } = useContext(ApiContext);
 
-  const newRequest = () => {
-    const askUploadData = new FormData();
-    askUploadData.append('ask_to', profileData.users);
-    newRequestFriend(askUploadData);
+  const handleOnFriendRequestClick = () => {
+    const friendRequestData = new FormData();
+    friendRequestData.append('ask_to', profileData.user);
+    postNewFriendRequest(friendRequestData);
   };
 
   return (
@@ -40,13 +39,13 @@ const Profile = ({ profileData, askData }) => {
         <Typography variant='h6'>{profileData.nick_name}</Typography>
         <Typography variant='h6'>{profileData.created_on}</Typography>
 
-        {!askData[0] && profile.id ? (
+        {profile.id && !askData[0] ? (
           <Button
             size='small'
             className={classes.button}
             variant='contained'
             color='primary'
-            onClick={() => newRequest()}
+            onClick={() => handleOnFriendRequestClick()}
           >
             Ask as friend
           </Button>

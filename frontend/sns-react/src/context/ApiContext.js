@@ -9,26 +9,18 @@ const ApiContextProvider = (props) => {
   const [profile, setProfile] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [editedProfile, setEditedProfile] = useState({ id: '', nick_name: '' });
+  // 自分宛てのFriendRequest
   const [askList, setAskList] = useState([]);
-  const [askListFull, setAskListFull] = useState([]);
+  // 全てのFriendRequest?
+  const [askListAll, setAskListAll] = useState([]);
   const [inbox, setInbox] = useState([]);
-  const [cover, setCover] = useState([]);
+  const [img, setImg] = useState([]);
 
   useEffect(() => {
     const getMyProfile = async () => {
       try {
         const myProfile = await axios.get(
-          'http://localhost:8000/api/user/myprofile/',
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
-
-        // FriendRequest
-        const approval = await axios.get(
-          'http://localhost:8000/api/user/friend-request/',
+          'http://localhost:8000/api/users/myprofile/',
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -42,13 +34,25 @@ const ApiContextProvider = (props) => {
             id: myProfile.data[0].id,
             nick_name: myProfile.data[0].nick_name,
           });
+
+        // FriendRequest
+        const friendRequests = await axios.get(
+          'http://localhost:8000/api/users/friend-requests/',
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
+
+        // 自分宛てのFriendRequestを抽出する
         myProfile.data[0] &&
           setAskList(
-            approval.data.filter((ask) => {
-              return myProfile.data[0].user === ask.ask_to;
+            friendRequests.data.filter((request) => {
+              return myProfile.data[0].user === request.ask_to;
             })
           );
-        setAskListFull(approval.data);
+        setAskListAll(friendRequests.data);
       } catch (error) {
         console.error(error);
       }
@@ -56,11 +60,14 @@ const ApiContextProvider = (props) => {
 
     const getProfiles = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/user/profile/', {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        });
+        const res = await axios.get(
+          'http://localhost:8000/api/users/profiles/',
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
         setProfiles(res.data);
       } catch (error) {
         console.error(error);
@@ -69,7 +76,7 @@ const ApiContextProvider = (props) => {
 
     const getInbox = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/dm/inbox/', {
+        const res = await axios.get('http://localhost:8000/api/dm/inboxes/', {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -88,11 +95,11 @@ const ApiContextProvider = (props) => {
   const createProfile = async () => {
     const createData = new FormData();
     createData.append('nick_name', editedProfile.nick_name);
-    cover.name && createData.append('img', cover, cover.name);
+    img.name && createData.append('img', img, img.name);
 
     try {
       const res = await axios.post(
-        'http://localhost:8000/api/user/profile/',
+        'http://localhost:8000/api/users/profiles/',
         createData,
         {
           headers: {
@@ -111,7 +118,7 @@ const ApiContextProvider = (props) => {
   const deleteProfile = async () => {
     try {
       await axios.delete(
-        `http://localhost:8000/api/user/profile/${profile.id}/`,
+        `http://localhost:8000/api/users/profiles/${profile.id}/`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -122,7 +129,7 @@ const ApiContextProvider = (props) => {
       setProfiles(profiles.filter((p) => p.id !== profile.id));
       setProfile([]);
       setEditedProfile({ id: '', nick_name: '' });
-      setCover([]);
+      setImg([]);
       setAskList([]);
     } catch (error) {
       console.log(error);
@@ -132,11 +139,11 @@ const ApiContextProvider = (props) => {
   const editProfile = async () => {
     const editData = new FormData();
     editData.append('nick_name', editedProfile.nick_name);
-    cover.name && editData.append('img', cover, cover.name);
+    img.name && editData.append('img', img, img.name);
 
     try {
       const res = await axios.put(
-        `http://localhost:8000/api/user/profile/${profile.id}/`,
+        `http://localhost:8000/api/users/profiles/${profile.id}/`,
         editData,
         {
           headers: {
@@ -151,10 +158,10 @@ const ApiContextProvider = (props) => {
     }
   };
 
-  const newRequestFriend = async (askData) => {
+  const postNewFriendRequest = async (askData) => {
     try {
       const res = await axios.post(
-        'http://localhost:8000/api/user/friend-request/',
+        'http://localhost:8000/api/users/friend-requests/',
         askData,
         {
           headers: {
@@ -163,7 +170,7 @@ const ApiContextProvider = (props) => {
           },
         }
       );
-      setAskListFull([...setAskListFull, res.data]);
+      setAskListAll([...setAskListAll, res.data]);
     } catch (error) {
       console.log(error);
     }
@@ -171,7 +178,7 @@ const ApiContextProvider = (props) => {
 
   const sendDM = async (uploadDM) => {
     try {
-      await axios.post('http://localhost:8000/api/dm/message/', uploadDM, {
+      await axios.post('http://localhost:8000/api/dm/messages/', uploadDM, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Token ${token}`,
@@ -182,10 +189,10 @@ const ApiContextProvider = (props) => {
     }
   };
 
-  const changeApprovalRequest = async (uploadDataAsk, ask) => {
+  const changefriendRequestsRequest = async (uploadDataAsk, ask) => {
     try {
       const res = await axios.put(
-        `http://localhost:8000/api/user/friend-request/${ask.id}/`,
+        `http://localhost:8000/api/users/friend-requests/${ask.id}/`,
         uploadDataAsk,
         {
           headers: {
@@ -205,12 +212,12 @@ const ApiContextProvider = (props) => {
       newDataAskPut.append('ask_from', ask.ask_to);
       newDataAskPut.append('approved', true);
 
-      const resp = askListFull.filter((item) => {
+      const resp = askListAll.filter((item) => {
         return item.ask_from === profile.user && item.ask_to === ask.ask_from;
       });
       !resp[0]
         ? await axios.post(
-            `http://localhost:8000/api/user/friend-request/`,
+            `http://localhost:8000/api/users/friend-requests/`,
             newDataAsk,
             {
               headers: {
@@ -220,7 +227,7 @@ const ApiContextProvider = (props) => {
             }
           )
         : await axios.put(
-            `http://localhost:8000/api/user/friend-request/${resp[0].id}/`,
+            `http://localhost:8000/api/users/friend-requests/${resp[0].id}/`,
             newDataAskPut,
             {
               headers: {
@@ -239,16 +246,16 @@ const ApiContextProvider = (props) => {
       value={{
         profile,
         profiles,
-        cover,
-        setCover,
+        img,
+        setImg,
         askList,
-        askListFull,
+        askListAll,
         inbox,
-        newRequestFriend,
+        postNewFriendRequest,
         createProfile,
         editProfile,
         deleteProfile,
-        changeApprovalRequest,
+        changefriendRequestsRequest,
         sendDM,
         editedProfile,
         setEditedProfile,

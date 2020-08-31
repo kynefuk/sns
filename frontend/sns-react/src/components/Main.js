@@ -9,7 +9,7 @@ import Ask from './Ask';
 import InboxDM from './InboxDm';
 
 const Main = () => {
-  const { profiles, profile, askList, askListFull, inbox } = useContext(
+  const { profiles, profile, askList, askListAll, inbox } = useContext(
     ApiContext
   );
   // 自分以外のプロフィールを抽出
@@ -24,9 +24,10 @@ const Main = () => {
       <Profile
         key={filtered.id}
         profileData={filtered}
-        askData={askListFull.filter((ask) => {
+        askData={askListAll.filter((ask) => {
+          // FriendRequestを受信済みorFriendRequest送信済みのユーザを抽出
           return (
-            (filtered.user === ask.ask_from) | (filtered.user === ask.ask_to)
+            (ask.ask_from === filtered.user) | (ask.ask_to === filtered.user)
           );
         })}
       />
@@ -45,7 +46,7 @@ const Main = () => {
         </div>
         <h3 className='title-ask'>
           <BsFillPeopleFill className='badge' />
-          Approval request list
+          Friend request list
         </h3>
         <div className='app-details'>
           <ul>

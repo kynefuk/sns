@@ -6,7 +6,7 @@ from . import views
 app_name = "dm"
 
 router = DefaultRouter()
-router.register("message", views.MessageViewSet, basename="message")
-router.register("inbox", views.InboxListView, basename="inbox")
+router.register("messages", views.MessageViewSet, basename="messages")
+router.register("inboxes", views.InboxListView, basename="inboxes")
 
 urlpatterns = [path("", include(router.urls))]

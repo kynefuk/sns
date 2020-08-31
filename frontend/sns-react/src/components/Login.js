@@ -1,21 +1,24 @@
 import React, { useReducer } from 'react';
 import { withCookies } from 'react-cookie';
 import axios from 'axios';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
+import {
+  Avatar,
+  Button,
+  TextField,
+  Typography,
+  makeStyles,
+  Container,
+  CircularProgress,
+} from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import {
   START_FETCH,
   FETCH_SUCCESS,
   ERROR_CATCHED,
   TOGGLE_MODE,
   INPUT_EDIT,
-} from './actionTypes';
+} from '../types/actionTypes';
+import { loginReducer } from '../reducers/LoginReducer';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,79 +53,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const loginReducer = (state, action) => {
-  switch (action.type) {
-    case START_FETCH: {
-      return {
-        ...state,
-        isLoading: true,
-      };
-    }
-    case FETCH_SUCCESS: {
-      return {
-        ...state,
-        isLoading: false,
-      };
-    }
-    case ERROR_CATCHED: {
-      return {
-        ...state,
-        error: 'Email or password is not correct',
-        isLoading: false,
-      };
-    }
-    case INPUT_EDIT: {
-      return {
-        ...state,
-        [action.inputName]: action.payload,
-        error: '',
-      };
-    }
-    case TOGGLE_MODE: {
-      return {
-        ...state,
-        isLoginView: !state.isLoginView,
-      };
-    }
-    default:
-      return state;
-  }
-};
-
 const Login = (props) => {
   const classes = useStyles();
   const initialState = {
     isLoading: false,
     isLoginView: true,
     error: '',
-    credentialsLog: {
+    loginCredential: {
       username: '',
       password: '',
     },
-    credentialsReg: {
+    registerCredential: {
       email: '',
       password: '',
     },
   };
   const [state, dispatch] = useReducer(loginReducer, initialState);
 
-  const inputChanged = (event) => {
-    const credential = state.credentialsLog;
+  const loginInputChanged = (event) => {
+    const credential = state.loginCredential;
     credential[event.target.name] = event.target.value;
     dispatch({
       type: INPUT_EDIT,
-      inputName: 'state.credentialLog',
+      inputName: 'state.loginCredential',
       payload: credential,
     });
   };
 
-  const inputChangedReg = (event) => {
-    const cred = state.credentialsReg;
-    cred[event.target.name] = event.target.value;
+  const registerInputChanged = (event) => {
+    const credential = state.registerCredential;
+    credential[event.target.name] = event.target.value;
     dispatch({
       type: INPUT_EDIT,
-      inputName: 'state.credentialReg',
-      payload: cred,
+      inputName: 'state.registerCredential',
+      payload: credential,
     });
   };
 
@@ -133,12 +97,14 @@ const Login = (props) => {
         dispatch({ type: START_FETCH });
         const res = await axios.post(
           'http://localhost:8000/auth/',
-          state.credentialsLog,
+          state.loginCredential,
           {
             headers: { 'Content-Type': 'application/json' },
           }
         );
+
         props.cookies.set('current-token', res.data.token);
+
         res.data.token
           ? (window.location.href = '/profiles')
           : (window.location.href = '/');
@@ -149,8 +115,8 @@ const Login = (props) => {
       try {
         dispatch({ type: START_FETCH });
         axios.post(
-          'http://localhost:8000/api/user/create/',
-          state.credentialsReg,
+          'http://localhost:8000/api/users/create/',
+          state.registerCredential,
           {
             headers: { 'Content-Type': 'application/json' },
           }
@@ -180,58 +146,59 @@ const Login = (props) => {
           </Typography>
 
           {state.isLoginView ? (
-            <TextField
-              variant='outlined'
-              margin='normal'
-              fullWidth
-              label='Email'
-              name='username'
-              value={state.credentialsLog.username}
-              onChange={inputChanged}
-              autoFocus
-            />
+            <>
+              <TextField
+                variant='outlined'
+                margin='normal'
+                fullWidth
+                label='Email'
+                name='username'
+                value={state.loginCredential.username}
+                onChange={loginInputChanged}
+                autoFocus
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                fullWidth
+                label='Password'
+                type='password'
+                name='password'
+                value={state.loginCredential.password}
+                onChange={loginInputChanged}
+                autoFocus
+              />
+            </>
           ) : (
-            <TextField
-              variant='outlined'
-              margin='normal'
-              fullWidth
-              label='Email'
-              name='email'
-              value={state.credentialsReg.email}
-              onChange={inputChangedReg}
-              autoFocus
-            />
+            <>
+              <TextField
+                variant='outlined'
+                margin='normal'
+                fullWidth
+                label='Email'
+                name='email'
+                value={state.registerCredential.email}
+                onChange={registerInputChanged}
+                autoFocus
+              />
+              <TextField
+                variant='outlined'
+                margin='normal'
+                fullWidth
+                label='Password'
+                type='password'
+                name='password'
+                value={state.registerCredential.password}
+                onChange={registerInputChanged}
+                autoFocus
+              />
+            </>
           )}
 
-          {state.isLoginView ? (
-            <TextField
-              variant='outlined'
-              margin='normal'
-              fullWidth
-              label='Password'
-              type='password'
-              name='password'
-              value={state.credentialsLog.password}
-              onChange={inputChanged}
-              autoFocus
-            />
-          ) : (
-            <TextField
-              variant='outlined'
-              margin='normal'
-              fullWidth
-              label='Password'
-              type='password'
-              name='password'
-              value={state.credentialsReg.password}
-              onChange={inputChangedReg}
-              autoFocus
-            />
-          )}
           <span className={classes.spanError}>{state.error}</span>
 
           {state.isLoginView ? (
-            state.credentialsLog.password && state.credentialsLog.username ? (
+            state.loginCredential.username && state.loginCredential.password ? (
               <Button
                 className={classes.submit}
                 type='submit'
@@ -253,7 +220,8 @@ const Login = (props) => {
                 Login
               </Button>
             )
-          ) : state.credentialsReg.password && state.credentialsReg.email ? (
+          ) : state.registerCredential.email &&
+            state.registerCredential.password ? (
             <Button
               className={classes.submit}
               type='submit'

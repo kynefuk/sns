@@ -6,8 +6,8 @@ from . import views
 app_name = "user"
 
 router = DefaultRouter()
-router.register("profile", views.ProfileViewSet)
-router.register("friend-request", views.FriendRequestViewSet)
+router.register("profiles", views.ProfileViewSet)
+router.register("friend-requests", views.FriendRequestViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
