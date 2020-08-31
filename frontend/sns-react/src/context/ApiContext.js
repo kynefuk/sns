@@ -8,7 +8,7 @@ const ApiContextProvider = (props) => {
   const token = props.cookies.get('current-token');
   const [profile, setProfile] = useState([]);
   const [profiles, setProfiles] = useState([]);
-  const [editedProfile, setEditedProfile] = useState({ id: '', nickName: '' });
+  const [editedProfile, setEditedProfile] = useState({ id: '', nick_name: '' });
   const [askList, setAskList] = useState([]);
   const [askListFull, setAskListFull] = useState([]);
   const [inbox, setInbox] = useState([]);
@@ -28,7 +28,7 @@ const ApiContextProvider = (props) => {
 
         // FriendRequest
         const approval = await axios.get(
-          'http://localhost:8000/api/user/approval/',
+          'http://localhost:8000/api/user/friend-request/',
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -40,12 +40,12 @@ const ApiContextProvider = (props) => {
         myProfile.data[0] &&
           setEditedProfile({
             id: myProfile.data[0].id,
-            nickName: myProfile.data[0].nickName,
+            nick_name: myProfile.data[0].nick_name,
           });
         myProfile.data[0] &&
           setAskList(
             approval.data.filter((ask) => {
-              return myProfile.data[0].userPro === ask.askTo;
+              return myProfile.data[0].user === ask.ask_to;
             })
           );
         setAskListFull(approval.data);
@@ -87,7 +87,7 @@ const ApiContextProvider = (props) => {
 
   const createProfile = async () => {
     const createData = new FormData();
-    createData.append('nickName', editedProfile.nickName);
+    createData.append('nick_name', editedProfile.nick_name);
     cover.name && createData.append('img', cover, cover.name);
 
     try {
@@ -102,7 +102,7 @@ const ApiContextProvider = (props) => {
         }
       );
       setProfile(res.data);
-      setEditedProfile({ id: res.data.id, nickName: res.data.nickName });
+      setEditedProfile({ id: res.data.id, nick_name: res.data.nick_name });
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +110,7 @@ const ApiContextProvider = (props) => {
 
   const deleteProfile = async () => {
     try {
-      const res = await axios.delete(
+      await axios.delete(
         `http://localhost:8000/api/user/profile/${profile.id}/`,
         {
           headers: {
@@ -121,7 +121,7 @@ const ApiContextProvider = (props) => {
       );
       setProfiles(profiles.filter((p) => p.id !== profile.id));
       setProfile([]);
-      setEditedProfile({ id: '', nickName: '' });
+      setEditedProfile({ id: '', nick_name: '' });
       setCover([]);
       setAskList([]);
     } catch (error) {
@@ -131,7 +131,7 @@ const ApiContextProvider = (props) => {
 
   const editProfile = async () => {
     const editData = new FormData();
-    editData.append('nickName', editedProfile.nickName);
+    editData.append('nick_name', editedProfile.nick_name);
     cover.name && editData.append('img', cover, cover.name);
 
     try {
@@ -154,7 +154,7 @@ const ApiContextProvider = (props) => {
   const newRequestFriend = async (askData) => {
     try {
       const res = await axios.post(
-        'http://localhost:8000/api/user/approval/',
+        'http://localhost:8000/api/user/friend-request/',
         askData,
         {
           headers: {
@@ -185,7 +185,7 @@ const ApiContextProvider = (props) => {
   const changeApprovalRequest = async (uploadDataAsk, ask) => {
     try {
       const res = await axios.put(
-        `http://localhost:8000/api/user/approval/${ask.id}/`,
+        `http://localhost:8000/api/user/friend-request/${ask.id}/`,
         uploadDataAsk,
         {
           headers: {
@@ -197,20 +197,20 @@ const ApiContextProvider = (props) => {
       setAskList(askList.map((item) => (item.id === ask.id ? res.data : item)));
 
       const newDataAsk = new FormData();
-      newDataAsk.append('askTo', ask.askFrom);
+      newDataAsk.append('ask_to', ask.ask_from);
       newDataAsk.append('approved', true);
 
       const newDataAskPut = new FormData();
-      newDataAskPut.append('askTo', ask.askFrom);
-      newDataAskPut.append('askFrom', ask.askTo);
+      newDataAskPut.append('ask_to', ask.ask_from);
+      newDataAskPut.append('ask_from', ask.ask_to);
       newDataAskPut.append('approved', true);
 
       const resp = askListFull.filter((item) => {
-        return item.askFrom === profile.userPro && item.askTo === ask.askFrom;
+        return item.ask_from === profile.user && item.ask_to === ask.ask_from;
       });
       !resp[0]
         ? await axios.post(
-            `http://localhost:8000/api/user/approval/`,
+            `http://localhost:8000/api/user/friend-request/`,
             newDataAsk,
             {
               headers: {
@@ -220,7 +220,7 @@ const ApiContextProvider = (props) => {
             }
           )
         : await axios.put(
-            `http://localhost:8000/api/user/approval/${resp[0].id}/`,
+            `http://localhost:8000/api/user/friend-request/${resp[0].id}/`,
             newDataAskPut,
             {
               headers: {

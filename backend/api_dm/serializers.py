@@ -6,16 +6,16 @@ from core.models import FriendRequest, Message, User
 
 class FriendsFilter(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
-        """自分宛ての友達申請で承認済みの友達を抽出する"""
+        """自分宛ての友達申請&&承認済みの友達を抽出する"""
         request = self.context["request"]
-        friends = FriendRequest.objects.filter(
+        friend_requests = FriendRequest.objects.filter(
             (Q(ask_to=request.user) & Q(is_approved=True))
             # | (Q(ask_from=request.user) & Q(is_approved=True))
         )
 
         list_friend = []
-        for friend in friends:
-            list_friend.append(friend.ask_from.id)
+        for request in friend_requests:
+            list_friend.append(request.ask_from.id)
         queryset = User.objects.filter(id__in=list_friend)
 
         return queryset
@@ -23,7 +23,7 @@ class FriendsFilter(serializers.PrimaryKeyRelatedField):
 
 class MessageSerializer(serializers.ModelSerializer):
 
-    # Messageの送信先は自分のFriendだけ選択できるようにする
+    # Messageの送信先には自分のFriendのみを選択できるようにする
     receiver = FriendsFilter()
 
     class Meta:

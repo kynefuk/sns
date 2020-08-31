@@ -95,7 +95,7 @@ const ProfileManager = () => {
       </div>
 
       {editedProfile.id ? (
-        editedProfile.nickName ? (
+        editedProfile.nick_name ? (
           <button className='user' onClick={() => editProfile()}>
             <FaUserEdit />
           </button>
@@ -104,7 +104,7 @@ const ProfileManager = () => {
             <FaUserEdit />
           </button>
         )
-      ) : editedProfile.nickName && cover.name ? (
+      ) : editedProfile.nick_name && cover.name ? (
         <button className='user' onClick={() => createProfile()}>
           <BsPersonPlus />
         </button>
@@ -119,12 +119,12 @@ const ProfileManager = () => {
 
       <div className='profile-details'>
         <BsPersonCheckFill className='badge' />{' '}
-        {profile && <span>{profile.nickName}</span>}
+        {profile && <span>{profile.nick_name}</span>}
         <hr />
         <input
           type='text'
-          value={editedProfile.nickName}
-          name='nickName'
+          value={editedProfile.nick_name}
+          name='nick_name'
           onChange={handleInputChange()}
         />
         <hr />

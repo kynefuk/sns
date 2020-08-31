@@ -44,7 +44,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 def upload_path(instance, filename):
     ext = filename.split(".")[-1]
     return "/".join(
-        ["image", str(instance.user.id), str(instance.nick_ame) + str(".") + str(ext),],
+        [
+            "image",
+            str(instance.user.id),
+            str(instance.nick_name) + str(".") + str(ext),
+        ],
     )
 
 

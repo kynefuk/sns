@@ -22,7 +22,7 @@ const Profile = ({ profileData, askData }) => {
 
   const newRequest = () => {
     const askUploadData = new FormData();
-    askUploadData.append('askTo', profileData.userPro);
+    askUploadData.append('ask_to', profileData.users);
     newRequestFriend(askUploadData);
   };
 
@@ -37,7 +37,7 @@ const Profile = ({ profileData, askData }) => {
         />
       )}
       <CardContent style={{ padding: 5 }}>
-        <Typography variant='h6'>{profileData.nickName}</Typography>
+        <Typography variant='h6'>{profileData.nick_name}</Typography>
         <Typography variant='h6'>{profileData.created_on}</Typography>
 
         {!askData[0] && profile.id ? (

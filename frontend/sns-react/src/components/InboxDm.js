@@ -8,7 +8,7 @@ const InboxDM = ({ dm, prof }) => {
       {prof[0] && (
         <h4>
           <RiUserReceivedLine className='badge' />
-          {prof[0].nickName}
+          {prof[0].nick_name}
         </h4>
       )}
     </li>

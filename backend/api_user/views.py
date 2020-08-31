@@ -20,7 +20,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "put", "delete", "options"]
 
     def get_queryset(self):
-        """自分宛て、自分から送ったFriendRequestのみ"""
+        """自分宛て or 自分から送ったFriendRequestのみ"""
         return self.queryset.filter(
             Q(ask_to=self.request.user) | Q(ask_from=self.request.user)
         )

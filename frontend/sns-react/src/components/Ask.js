@@ -37,7 +37,7 @@ const Ask = ({ ask, prof }) => {
 
   const send = () => {
     const uploadDM = new FormData();
-    uploadDM.append('receiver', ask.askFrom);
+    uploadDM.append('receiver', ask.ask_from);
     uploadDM.append('message', text);
     sendDM(uploadDM);
     setModalIsOpen(false);
@@ -45,14 +45,14 @@ const Ask = ({ ask, prof }) => {
 
   const changeApproval = () => {
     const uploadDataAsk = new FormData();
-    uploadDataAsk.append('askTo', ask.askTo);
+    uploadDataAsk.append('ask_to', ask.ask_to);
     uploadDataAsk.append('approved', true);
     changeApprovalRequest(uploadDataAsk, ask);
   };
 
   return (
     <li className='list-item'>
-      <h4>{prof[0].nickName}</h4>
+      <h4>{prof[0].nick_name}</h4>
       {!ask.approved ? (
         <Button
           size='small'

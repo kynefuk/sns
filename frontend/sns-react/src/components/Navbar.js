@@ -38,7 +38,7 @@ const Navbar = (props) => {
               return (
                 ask.approved === false &&
                 profiles.filter((item) => {
-                  return item.userPro === ask.askFrom;
+                  return item.user_pro === ask.ask_from;
                 })[0]
               );
             }).length

@@ -132,7 +132,7 @@ const Login = (props) => {
       try {
         dispatch({ type: START_FETCH });
         const res = await axios.post(
-          'http://localhost:8000/authen/',
+          'http://localhost:8000/auth/',
           state.credentialsLog,
           {
             headers: { 'Content-Type': 'application/json' },

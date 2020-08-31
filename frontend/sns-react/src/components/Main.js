@@ -26,8 +26,7 @@ const Main = () => {
         profileData={filtered}
         askData={askListFull.filter((ask) => {
           return (
-            (filtered.userPro === ask.askFrom) |
-            (filtered.userPro === ask.askTo)
+            (filtered.user === ask.ask_from) | (filtered.user === ask.ask_to)
           );
         })}
       />
@@ -55,7 +54,7 @@ const Main = () => {
                 <Ask
                   key={ask.id}
                   ask={ask}
-                  prof={profiles.filter((item) => item.userPro === ask.askFrom)}
+                  prof={profiles.filter((item) => item.user === ask.ask_from)}
                 />
               ))}
           </ul>
@@ -74,7 +73,7 @@ const Main = () => {
                   <InboxDM
                     key={dm.id}
                     dm={dm}
-                    prof={profiles.filter((item) => item.userPro === dm.sender)}
+                    prof={profiles.filter((item) => item.user === dm.sender)}
                   />
                 ))}
             </ul>
