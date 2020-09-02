@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Profile = ({ profileData, askData }) => {
+export const UserList = ({ profileData, askData }) => {
   const classes = useStyles();
   const { postNewFriendRequest, profile } = useContext(ApiContext);
 
@@ -35,9 +35,13 @@ const Profile = ({ profileData, askData }) => {
           image='http://localhost:8000/media/image/null.png'
         />
       )}
-      <CardContent style={{ padding: 5 }}>
-        <Typography variant='h6'>{profileData.nick_name}</Typography>
-        <Typography variant='h6'>{profileData.created_on}</Typography>
+      <CardContent style={{ padding: 3 }}>
+        <Typography variant='h6' style={{ marginLeft: 20 }}>
+          {profileData.nick_name}
+        </Typography>
+        <Typography variant='h6' style={{ marginLeft: 20 }}>
+          {profileData.created_on}
+        </Typography>
 
         {profile.id && !askData[0] ? (
           <Button
@@ -64,5 +68,3 @@ const Profile = ({ profileData, askData }) => {
     </Card>
   );
 };
-
-export default Profile;

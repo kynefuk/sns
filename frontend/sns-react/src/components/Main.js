@@ -3,9 +3,9 @@ import { ApiContext } from '../context/ApiContext';
 import { Grid } from '@material-ui/core';
 import { GoMail } from 'react-icons/go';
 import { BsFillPeopleFill } from 'react-icons/bs';
-import Profile from './Profile';
+import { UserList } from './UserList';
 import ProfileManager from './ProfileManager';
-import Ask from './Ask';
+import FriendRequestList from './FriendRequestList';
 import InboxDM from './InboxDm';
 
 const Main = () => {
@@ -18,14 +18,14 @@ const Main = () => {
   });
 
   // 自分以外のプロフィールを表示
-  const listProfiles =
+  const userList =
     filterProfiles &&
     filterProfiles.map((filtered) => (
-      <Profile
+      <UserList
         key={filtered.id}
         profileData={filtered}
         askData={askListAll.filter((ask) => {
-          // FriendRequestを受信済みorFriendRequest送信済みのユーザを抽出
+          // フレンドリクエスト受信済み or フレンドリクエスト送信済みのユーザを抽出
           return (
             (ask.ask_from === filtered.user) | (ask.ask_to === filtered.user)
           );
@@ -37,7 +37,7 @@ const Main = () => {
     <Grid container>
       <Grid item xs={4}>
         <div className='app-profiles'>
-          <div className='task-list'>{listProfiles}</div>
+          <div className='task-list'>{userList}</div>
         </div>
       </Grid>
       <Grid item xs={4}>
@@ -52,7 +52,7 @@ const Main = () => {
           <ul>
             {profile.id &&
               askList.map((ask) => (
-                <Ask
+                <FriendRequestList
                   key={ask.id}
                   ask={ask}
                   prof={profiles.filter((item) => item.user === ask.ask_from)}

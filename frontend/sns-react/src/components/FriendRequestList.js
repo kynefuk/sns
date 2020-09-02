@@ -14,12 +14,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Ask = ({ ask, prof }) => {
+const FriendRequestList = ({ ask, prof }) => {
   const classes = useStyles();
   Modal.setAppElement('#root');
-  const { changeApprovalRequest, sendDM } = useContext(ApiContext);
+  const { approveFriendRequest, sendDM } = useContext(ApiContext);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [text, setText] = useState('');
+  const [message, setMessage] = useState('');
 
   const customStyle = {
     content: {
@@ -32,34 +32,34 @@ const Ask = ({ ask, prof }) => {
 
   const handleInputChange = (event) => {
     const value = event.target.value;
-    setText(value);
+    setMessage(value);
   };
 
   const send = () => {
     const uploadDM = new FormData();
     uploadDM.append('receiver', ask.ask_from);
-    uploadDM.append('message', text);
+    uploadDM.append('message', message);
     sendDM(uploadDM);
     setModalIsOpen(false);
   };
 
-  const changeApproval = () => {
-    const uploadDataAsk = new FormData();
-    uploadDataAsk.append('ask_to', ask.ask_to);
-    uploadDataAsk.append('approved', true);
-    changeApprovalRequest(uploadDataAsk, ask);
+  const handleOnApproveClick = () => {
+    const requestBody = new FormData();
+    requestBody.append('ask_to', ask.ask_to);
+    requestBody.append('is_approved', true);
+    approveFriendRequest(requestBody, ask);
   };
 
   return (
     <li className='list-item'>
       <h4>{prof[0].nick_name}</h4>
-      {!ask.approved ? (
+      {!ask.is_approved ? (
         <Button
           size='small'
           className={classes.button}
           variant='contained'
           color='primary'
-          onClick={() => changeApproval()}
+          onClick={() => handleOnApproveClick()}
         >
           Approve
         </Button>
@@ -71,7 +71,9 @@ const Ask = ({ ask, prof }) => {
 
       <Modal
         isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
+        onRequestClose={() => {
+          setModalIsOpen(false);
+        }}
         style={customStyle}
       >
         <Typography>Message</Typography>
@@ -92,4 +94,4 @@ const Ask = ({ ask, prof }) => {
   );
 };
 
-export default Ask;
+export default FriendRequestList;

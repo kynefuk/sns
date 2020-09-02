@@ -189,11 +189,11 @@ const ApiContextProvider = (props) => {
     }
   };
 
-  const changefriendRequestsRequest = async (uploadDataAsk, ask) => {
+  const approveFriendRequest = async (requestBody, ask) => {
     try {
       const res = await axios.put(
         `http://localhost:8000/api/users/friend-requests/${ask.id}/`,
-        uploadDataAsk,
+        requestBody,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -203,9 +203,11 @@ const ApiContextProvider = (props) => {
       );
       setAskList(askList.map((item) => (item.id === ask.id ? res.data : item)));
 
-      const newDataAsk = new FormData();
-      newDataAsk.append('ask_to', ask.ask_from);
-      newDataAsk.append('approved', true);
+      // ユーザA → ユーザBのフレンドリクエストを承認済みにした後に
+      // ユーザB → ユーザAのフレンドリクエストを作成し、承認済みにする
+      const requestData = new FormData();
+      requestData.append('ask_to', ask.ask_from);
+      requestData.append('approved', true);
 
       const newDataAskPut = new FormData();
       newDataAskPut.append('ask_to', ask.ask_from);
@@ -218,7 +220,7 @@ const ApiContextProvider = (props) => {
       !resp[0]
         ? await axios.post(
             `http://localhost:8000/api/users/friend-requests/`,
-            newDataAsk,
+            requestData,
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -255,7 +257,7 @@ const ApiContextProvider = (props) => {
         createProfile,
         editProfile,
         deleteProfile,
-        changefriendRequestsRequest,
+        approveFriendRequest,
         sendDM,
         editedProfile,
         setEditedProfile,
